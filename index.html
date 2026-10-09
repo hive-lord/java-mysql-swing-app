@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Traffic Management System — Project Documentation</title>
+<style>
+  :root{
+    --ink:#0f172a; --body:#334155; --muted:#64748b;
+    --line:#e2e8f0; --bg:#ffffff; --soft:#f8fafc;
+    --accent:#1e40af;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif;background:var(--bg);color:var(--body);line-height:1.65;font-size:15.5px}
+  header{border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:10}
+  .nav{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  .nav .title{font-size:15px;font-weight:700;color:var(--ink)}
+  .nav .title span{display:block;font-size:12px;font-weight:500;color:var(--muted)}
+  .nav nav{display:flex;gap:16px;flex-wrap:wrap}
+  .nav nav a{font-size:13px;color:var(--muted);text-decoration:none}
+  .nav nav a:hover{color:var(--accent)}
+  main{max-width:920px;margin:0 auto;padding:32px 24px 64px}
+  h1{font-size:30px;color:var(--ink);letter-spacing:-.02em;margin:8px 0 8px}
+  h2{font-size:19px;color:var(--ink);margin:32px 0 10px;padding-top:24px;border-top:1px solid var(--line)}
+  h3{font-size:15px;color:var(--ink);margin:18px 0 6px}
+  p{margin:8px 0}
+  .lede{font-size:16.5px;color:var(--body);max-width:68ch}
+  .meta{font-size:13px;color:var(--muted);margin-top:10px}
+  .meta code{background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-size:12.5px}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:var(--soft);color:var(--ink);font-weight:600;font-size:13px}
+  code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13.5px}
+  pre{background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:16px;overflow:auto;font-size:13px;margin:12px 0;color:var(--ink)}
+  .file{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:10px 0;background:#fff}
+  .file .path{font-family:ui-monospace,Consolas,monospace;font-size:13px;color:var(--accent);font-weight:600}
+  .file .role{font-size:13px;color:var(--muted);margin:2px 0 6px}
+  .file p{font-size:14.5px;margin:4px 0}
+  .file ul{margin:6px 0 2px 18px;font-size:14px}
+  .pkg{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:22px 0 4px}
+  .note{border-left:3px solid var(--accent);background:var(--soft);padding:10px 14px;margin:12px 0;font-size:14px}
+  .warn{border-left:3px solid #b45309;background:#fffbeb;padding:10px 14px;margin:12px 0;font-size:14px}
+  ol,ul{margin:8px 0 8px 20px}
+  li{margin:3px 0}
+  footer{border-top:1px solid var(--line);padding:20px 24px;text-align:center;font-size:12.5px;color:var(--muted)}
+  a{color:var(--accent)}
+  @media(max-width:640px){h1{font-size:24px}th,td{font-size:13px}}
+  @media print{header{position:static}main{padding:0}h2{break-after:avoid}}
+</style>
+</head>
+<body>
+<header>
+  <div class="nav">
+    <div class="title">Traffic Management System<span>Java &middot; MySQL &middot; Swing &middot; Sem-3 AOOPs</span></div>
+    <nav>
+      <a href="#overview">Overview</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#mapping">Domain mapping</a>
+      <a href="#files">File reference</a>
+      <a href="#database">Database</a>
+      <a href="#workflows">Workflows</a>
+      <a href="#status">Status</a>
+      <a href="#run">Run</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <p class="meta">Project documentation &middot; Single file: <code>index.html</code> &middot; Package <code>com.javaproject</code> &middot; Java 17 / Maven</p>
+  <h1>Traffic Management System</h1>
+  <p class="lede">A desktop-based system for managing traffic personnel, registered vehicles, violations and fines. Built with a MySQL backend, layered Java core, and a Swing frontend. The repository is currently a documented skeleton: package structure and interfaces are in place, method bodies are marked TODO for implementation.</p>
+  <p class="lede" style="font-size:14.5px;color:var(--muted)">Design reference: a small, Flock-like operational tool — officers log in, look up vehicles, record violations, and track repeat offenders from a shared desktop console backed by a central database.</p>
+
+  <h2 id="overview">1. Overview</h2>
+  <p><strong>What it does.</strong> (a) Authenticates traffic staff and administrators. (b) Maintains a registry of vehicles / cases. (c) Records violations, adjusts dues, searches by number / owner / category, and flags repeat or unpaid cases. (d) Provides an audit trail via timestamps and optimistic-locking version fields.</p>
+  <p><strong>Who uses it.</strong> Admin (manages accounts and roles), Traffic Officer / Manager (issues and updates challans), front-desk operator (lookup and reporting). The current <code>UserRole</code> enum — ADMIN, MANAGER, USER — maps directly to these three.</p>
+  <p><strong>Scope.</strong> Offline-first desktop console for a station or checkpoint. Not a real-time signal-control or ANPR system; no web or mobile client in this phase.</p>
+
+  <h2 id="architecture">2. Architecture</h2>
+  <p>Strict layered design. Each layer only talks to the one below it:</p>
+  <pre>Swing UI (to be built: MainFrame)
+  └─&gt; Service layer  (validation, hashing, business rules)
+       └─&gt; DAO layer  (JDBC PreparedStatement, ResultSet mapping)
+            └─&gt; MySQL (users, vehicles tables)
+Config + Util support all layers (JSON config, connections, hashing, money math).</pre>
+  <p>Data flow for a typical action (e.g. issuing a challan): UI collects input → Service validates and applies rules → DAO executes parameterised SQL → MySQL commits → result mapped back to a model object and shown in the UI.</p>
+
+  <h3>Technology stack</h3>
+  <table>
+    <tr><th>Component</th><th>Detail</th><th>Purpose</th></tr>
+    <tr><td>Java</td><td>17, Maven jar, UTF-8</td><td>Core language and build</td></tr>
+    <tr><td>MySQL Connector/J</td><td>8.0.33</td><td>JDBC driver (<code>com.mysql.cj.jdbc.Driver</code>)</td></tr>
+    <tr><td>Jackson Databind</td><td>2.15.2</td><td>Reads/writes JSON database config</td></tr>
+    <tr><td>SLF4J + Logback</td><td>2.0.9 / 1.4.11</td><td>Logging</td></tr>
+    <tr><td>Swing</td><td>JDK built-in</td><td>Desktop UI (planned <code>ui.MainFrame</code>)</td></tr>
+    <tr><td>BCrypt (planned)</td><td><code>org.mindrot:jbcrypt</code> — not yet in pom</td><td>Password hashing, 12 rounds</td></tr>
+  </table>
+
+  <h2 id="mapping">3. Domain mapping (important)</h2>
+  <p>The skeleton uses generic entity names inherited from its template. In this traffic deployment they mean:</p>
+  <table>
+    <tr><th>Code name</th><th>Traffic meaning</th><th>Example</th></tr>
+    <tr><td><code>User</code></td><td>System account: admin, officer, operator</td><td>Officer login, role-based access, last-login tracking</td></tr>
+    <tr><td><code>Product</code></td><td>Registered vehicle / challan record</td><td>Number plate as SKU, owner as name, fine amount as price, dues as stock</td></tr>
+    <tr><td><code>Product.category</code></td><td>Vehicle class or violation type</td><td>Two-wheeler / LMV / HMV; or speeding / no-helmet / signal-jump</td></tr>
+    <tr><td><code>Product.price</code></td><td>Fine amount (BigDecimal, 2 decimals)</td><td>Exact money handling via PriceUtil</td></tr>
+    <tr><td><code>updateStock</code></td><td>Adjust dues / violation count</td><td>Positive on new challan, negative on payment</td></tr>
+    <tr><td><code>low-stock</code></td><td>Watchlist query</td><td>Repeat offenders / unpaid dues above threshold</td></tr>
+  </table>
+  <div class="note">Recommendation for the final submission: rename <code>Product → Vehicle</code> (or <code>Challan</code>) and <code>sku → registrationNo</code>. The logic is identical; only names change. Until then, read every “product” reference below as “vehicle record”.</div>
+
+  <h2 id="files">4. File-by-file reference</h2>
+  <p>All paths relative to <code>src/main/java/com/javaproject/</code>. Every file is currently a skeleton — signatures and TODOs are present, bodies return stubs.</p>
+
+  <div class="pkg">model/ — Entities mapped to tables</div>
+
+  <div class="file">
+    <div class="path">model/BaseEntity.java</div>
+    <div class="role">Abstract base class · parent of all entities</div>
+    <p>Declares the common audit fields every table shares: <code>id</code>, <code>createdAt</code>, <code>updatedAt</code>, <code>version</code> (for optimistic locking). Also owns <code>equals/hashCode</code> (by id) and <code>toString</code>.</p>
+    <ul><li>Traffic use: gives every officer account and vehicle record a stable id plus a change history.</li></ul>
+  </div>
+
+  <div class="file">
+    <div class="path">model/User.java (+ UserRole enum, same file)</div>
+    <div class="role">Account entity → <code>users</code> table</div>
+    <p>Fields: <code>username, email, passwordHash, firstName, lastName, phoneNumber, active, role, lastLoginAt</code>. Constructor takes <code>(username, email, passwordHash)</code>. Helpers: <code>getFullName()</code>; <code>toString()</code> excludes the hash.</p>
+    <ul><li>Traffic use: officer/admin login accounts; <code>role</code> distinguishes ADMIN / MANAGER (senior officer) / USER (officer-operator).</li></ul>
+  </div>
+
+  <div class="file">
+    <div class="path">model/Product.java</div>
+    <div class="role">Registry entity → <code>products</code> table (read: vehicles / challans)</div>
+    <p>Fields: <code>name, description, sku (unique), price, quantityInStock, reorderLevel, category, active, discontinuedAt</code>. Constructor takes <code>(name, sku, price)</code>. Helpers: <code>isLowStock()</code> (qty ≤ reorder level), <code>isAvailable()</code> (active and qty &gt; 0).</p>
+    <ul><li>Traffic use: <code>sku</code> = registration number, <code>price</code> = fine amount, <code>quantity</code> = pending dues/count, <code>category</code> = vehicle class or violation type.</li></ul>
+  </div>
+
+  <div class="pkg">config/ — Database settings object</div>
+
+  <div class="file">
+    <div class="path">config/DatabaseConfig.java</div>
+    <div class="role">Jackson-mapped POJO holding connection settings</div>
+    <p>Holds <code>host, port, database, username, password, useSSL, serverTimezone, allowPublicKeyRetrieval, connectionTimeout, maxPoolSize</code> with defaults (localhost:3306, javaproject, root). Methods: <code>buildJdbcUrl()</code> composes the JDBC URL; <code>validate()</code> rejects missing host/database/username or bad port.</p>
+  </div>
+
+  <div class="pkg">util/ — Cross-cutting helpers</div>
+
+  <div class="file">
+    <div class="path">util/DatabaseConnection.java</div>
+    <div class="role">Connection manager (single-connection; HikariCP suggested for production)</div>
+    <p>Constructor stores config and loads the driver once (<code>Class.forName("com.mysql.cj.jdbc.Driver")</code> guarded by AtomicBoolean). <code>getConnection()</code> opens via DriverManager with autoCommit=false. Also: <code>testConnection()</code>, <code>close()</code>, <code>initializeSchema()</code> (CREATE TABLE IF NOT EXISTS for users + vehicles, plus indexes).</p>
+  </div>
+
+  <div class="file">
+    <div class="path">util/ConfigLoader.java (+ ConfigException, same file)</div>
+    <div class="role">Static JSON config reader/writer via Jackson ObjectMapper</div>
+    <p><code>loadDatabaseConfig()</code> checks <code>config/database.json</code> then the classpath; <code>loadDatabaseConfig(path)</code> reads a given path; <code>saveDatabaseConfig(config, path)</code> creates directories and pretty-prints JSON; <code>createDefaultConfig(path)</code> writes defaults. Failures surface as <code>ConfigException</code>.</p>
+  </div>
+
+  <div class="file">
+    <div class="path">util/PasswordUtil.java</div>
+    <div class="role">BCrypt wrapper for officer passwords</div>
+    <p><code>hashPassword(plain)</code> / <code>hashPassword(plain, logRounds)</code>, <code>verifyPassword(plain, hash)</code>, <code>needsRehash(hash)</code>, <code>generateSalt()</code>, <code>rehashPassword(plain)</code>. Work factor LOG_ROUNDS = 12. Plain passwords never touch the database.</p>
+  </div>
+
+  <div class="file">
+    <div class="path">util/PriceUtil.java</div>
+    <div class="role">Exact money arithmetic for fines</div>
+    <p>SCALE = 2, HALF_EVEN rounding. Static <code>round/add/subtract/multiply/divide/isPositive</code> — every operation re-rounds so fine totals stay to the paisa/rupee cent.</p>
+    <ul><li>Traffic use: fine calculation, late penalties, payment adjustments.</li></ul>
+  </div>
+
+  <div class="pkg">dao/ — Data access (SQL lives here and nowhere else)</div>
+
+  <div class="file">
+    <div class="path">dao/GenericDAO.java</div>
+    <div class="role">Generic CRUD contract for every entity</div>
+    <p><code>save / update / deleteById / findById / findAll / existsById / count</code>. Fully defined interface — no TODOs. This is what makes User and Vehicle DAOs interchangeable in tests.</p>
+  </div>
+
+  <div class="file">
+    <div class="path">dao/DAOException.java</div>
+    <div class="role">Checked exception for the DAO layer</div>
+    <p>Carries <code>operation</code> (e.g. “save”) and <code>entityName</code> (e.g. “User”), with constructors for message / cause, an enriched <code>getMessage()</code>, and a factory mapping SQL codes (duplicate key, foreign key) to readable errors.</p>
+  </div>
+
+  <div class="file">
+    <div class="path">dao/UserDAO.java</div>
+    <div class="role">Officer-account queries (interface, fully defined)</div>
+    <p>Beyond CRUD: <code>findByUsername, findByEmail, existsByUsername, existsByEmail, findByRole, findActiveUsers, updateLastLogin, searchByName, changePassword</code>.</p>
+  </div>
+
+  <div class="file">
+    <div class="path">dao/UserDAOImpl.java</div>
+    <div class="role">JDBC implementation of UserDAO (all methods stubbed)</div>
+    <p>Per-method TODOs spell out the exact SQL (e.g. <code>INSERT INTO users … RETURN_GENERATED_KEYS</code>, <code>UPDATE … WHERE id=? AND version=?</code>, case-insensitive <code>LOWER(username)=LOWER(?)</code>), parameter binding, generated-key retrieval, and a private <code>mapResultSetToUser()</code> helper.</p>
+  </div>
+
+  <div class="file">
+    <div class="path">dao/ProductDAO.java</div>
+    <div class="role">Vehicle/challan queries (interface, fully defined — read “Product” as “Vehicle”)</div>
+    <p><code>findBySku, existsBySku, findByCategory, findActiveProducts, findLowStockProducts, searchByName, findByPriceRange, updateStock, getStockQuantity, discontinueProduct</code>.</p>
+  </div>
+
+  <div class="file">
+    <div class="path">dao/ProductDAOImpl.java</div>
+    <div class="role">JDBC implementation of ProductDAO (all methods stubbed)</div>
+    <p>Same pattern as UserDAOImpl plus traffic-relevant guards: negative-dues check in <code>updateStock</code>, version-checked updates, soft-discontinue (<code>active=false, discontinued_at=?</code>), and a <code>mapResultSetToProduct()</code> helper.</p>
+  </div>
+
+  <div class="pkg">service/ — Business rules (validation lives here, not in the UI)</div>
+
+  <div class="file">
+    <div class="path">service/ServiceException.java</div>
+    <div class="role">Checked exception for the service layer</div>
+    <p>Wraps DAOException with a service-level message (and optional errorCode for future API mapping).</p>
+  </div>
+
+  <div class="file">
+    <div class="path">service/UserService.java</div>
+    <div class="role">Account business operations (interface, fully defined)</div>
+    <p><code>registerUser, authenticate, updateProfile, changePassword, findById, findByUsername, getActiveUsers, getUsersByRole, searchUsers, deactivateUser, activateUser, changeUserRole</code>.</p>
+  </div>
+
+  <div class="file">
+    <div class="path">service/UserServiceImpl.java</div>
+    <div class="role">Implementation (stubbed) — regex validation + hashing + uniqueness</div>
+    <p>Validates username (<code>^[a-zA-Z0-9_]{3,20}$</code>), email pattern, min password length 8; checks <code>existsByUsername/Email</code>; hashes via PasswordUtil; sets role USER and active=true on registration; <code>authenticate</code> tries username then email, verifies hash, stamps last login.</p>
+  </div>
+
+  <div class="file">
+    <div class="path">service/ProductService.java</div>
+    <div class="role">Vehicle/challan business operations (interface, fully defined)</div>
+    <p><code>createProduct, updateProduct, adjustStock, findById, findBySku, getActiveProducts, getProductsByCategory, getLowStockProducts, searchProducts, getProductsByPriceRange, discontinueProduct, reactivateProduct, getStockQuantity, getAllCategories</code>.</p>
+  </div>
+
+  <div class="file">
+    <div class="path">service/ProductServiceImpl.java</div>
+    <div class="role">Implementation (stubbed) — validates registration no., fine, counts</div>
+    <p>Rejects blank name/sku/category, non-positive price, negative quantities; checks <code>existsBySku</code> before create; rounds money via PriceUtil; delegates stock moves to the DAO and surfaces “insufficient dues” as ServiceException.</p>
+  </div>
+
+  <div class="pkg">ui/ + build files — Not yet / supporting</div>
+
+  <div class="file">
+    <div class="path">ui/MainFrame.java — missing</div>
+    <div class="role">Planned Swing entry point (<code>pom.xml</code> manifest points here)</div>
+    <p>To build: <code>com.javaproject.ui.MainFrame extends JFrame</code> — login panel, vehicle table, challan dialog. Application will not launch until this exists.</p>
+  </div>
+
+  <div class="file">
+    <div class="path">pom.xml</div>
+    <div class="role">Maven build: Java 17, MySQL + Jackson + logging deps, jar with MainFrame manifest</div>
+    <p>Group <code>com.javaproject</code>. Plugins: compiler 3.11.0, jar 3.3.0. Needs one addition: <code>org.mindrot:jbcrypt:0.4</code>.</p>
+  </div>
+
+  <h2 id="database">5. Database</h2>
+  <div class="note">Table <code>products</code> in code = vehicle/challan registry. Columns below keep code names with traffic meaning in brackets.</div>
+  <h3>users — staff accounts</h3>
+  <table>
+    <tr><th>Column</th><th>Notes</th></tr>
+    <tr><td>id</td><td>BIGINT PK, auto-increment</td></tr>
+    <tr><td>username, email</td><td>UNIQUE, indexed; case-insensitive lookup</td></tr>
+    <tr><td>password_hash</td><td>BCrypt hash only</td></tr>
+    <tr><td>first_name, last_name, phone_number</td><td>Officer details</td></tr>
+    <tr><td>active, role</td><td>Soft-disable; ADMIN / MANAGER / USER</td></tr>
+    <tr><td>last_login_at, created_at, updated_at, version</td><td>Audit + optimistic locking</td></tr>
+  </table>
+  <h3>products — vehicle / challan records</h3>
+  <table>
+    <tr><th>Column</th><th>Traffic meaning</th></tr>
+    <tr><td>sku (UNIQUE)</td><td>Registration number</td></tr>
+    <tr><td>name, description</td><td>Owner + vehicle description / violation note</td></tr>
+    <tr><td>price DECIMAL(10,2)</td><td>Fine amount</td></tr>
+    <tr><td>quantity_in_stock, reorder_level</td><td>Pending dues / violation count; watchlist threshold</td></tr>
+    <tr><td>category</td><td>Vehicle class or violation type, indexed</td></tr>
+    <tr><td>active, discontinued_at</td><td>Soft-close settled cases</td></tr>
+  </table>
+
+  <h2 id="workflows">6. Core workflows</h2>
+  <h3>Officer login</h3>
+  <p>Login form → <code>UserService.authenticate</code> → <code>UserDAO.findByUsername / findByEmail</code> → <code>PasswordUtil.verifyPassword</code> → <code>updateLastLogin</code>. Failed logins return empty, never reveal which field was wrong.</p>
+  <h3>Issue / settle challan</h3>
+  <p>Create record → <code>ProductService.createProduct</code> (validate reg. no., round fine) → <code>ProductDAO.save</code>. New offence → <code>adjustStock(+)</code>; payment → <code>adjustStock(−)</code> with negative-balance guard. Watchlist → <code>getLowStockProducts</code>; settled → <code>discontinueProduct</code> (soft-close).</p>
+
+  <h2 id="status">7. Implementation status</h2>
+  <p><strong>Done:</strong> package structure, all interfaces with Javadoc, exact SQL documented in TODO comments, Maven build file.</p>
+  <p><strong>Remaining:</strong> every method body (fields, constructors, JDBC execution, validation, hashing, UI). Suggested order: BaseEntity → User/Vehicle → DatabaseConfig → ConfigLoader → DatabaseConnection + schema → DAO impls → Service impls → MainFrame UI.</p>
+  <div class="warn"><strong>Fix before coding:</strong> (1) Add <code>org.mindrot:jbcrypt:0.4</code> to <code>pom.xml</code> — <code>PasswordUtil</code> already imports it. (2) <code>UserRole</code> is declared as a package-private top-level enum but referenced as <code>User.UserRole</code> — move it inside <code>User</code> as a nested public enum. (3) Create <code>ui/MainFrame</code> — the jar manifest already points to it.</div>
+
+  <h2 id="run">8. Build and run</h2>
+  <pre>CREATE DATABASE trafficdb;   -- or keep name javaproject for now
+
+mvn clean package
+java -jar target/java-mysql-swing-app-1.0-SNAPSHOT.jar
+-- requires ui.MainFrame to exist; until then use mvn compile to check progress</pre>
+  <p>Config file location: <code>config/database.json</code> (created via <code>ConfigLoader.createDefaultConfig</code>).</p>
+
+  <h2 id="oops">9. OOP concepts demonstrated (for viva)</h2>
+  <table>
+    <tr><th>Concept</th><th>Where</th></tr>
+    <tr><td>Inheritance</td><td><code>User / Product extends BaseEntity</code></td></tr>
+    <tr><td>Abstraction</td><td>DAO and Service interfaces hide JDBC and rules from the UI</td></tr>
+    <tr><td>Encapsulation</td><td>Private fields + accessors; password hash excluded from <code>toString</code></td></tr>
+    <tr><td>Polymorphism / Generics</td><td><code>GenericDAO&lt;T extends BaseEntity, ID&gt;</code>; impls swappable</td></tr>
+    <tr><td>Exception layering</td><td><code>SQLException → DAOException → ServiceException</code></td></tr>
+    <tr><td>Patterns</td><td>DAO, Service layer, soft-delete, optimistic locking via <code>version</code></td></tr>
+  </table>
+</main>
+
+<footer>Traffic Management System &middot; Project documentation &middot; Open this file in a browser — no server required &middot; Print to PDF for submission</footer>
+</body>
+</html>
