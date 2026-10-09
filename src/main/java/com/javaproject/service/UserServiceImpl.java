@@ -9,158 +9,153 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
- * Implementation of UserService.
- * Contains business logic, validation, and password hashing.
+ * Reviewer-account business logic for Big Brother.
+ * Contains validation, password hashing, and DAO orchestration.
+ *
+ * <p>Rules enforced here (not in UI or DAO): username/email format, password
+ * strength, uniqueness, active-check on login, last-login stamping. All
+ * DAOException are translated to ServiceException.</p>
  */
 public class UserServiceImpl implements UserService {
-    // TODO: Add private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class)
-    // TODO: Add private final UserDAO userDAO field
-    // TODO: Add private final PasswordUtil passwordUtil field
-    // TODO: Add private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$")
-    // TODO: Add private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{3,20}$")
-    // TODO: Add private static final int MIN_PASSWORD_LENGTH = 8
-    // TODO: Add constructor accepting UserDAO and PasswordUtil
+
+    // TODO 0a: `private static final Logger logger = ...UserServiceImpl.class);`
+    // TODO 0b: `private final UserDAO userDAO;` + `private final PasswordUtil passwordUtil;`
+    // TODO 0c: Patterns + constant:
+    //   EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
+    //   USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{3,20}$");
+    //   MIN_PASSWORD_LENGTH = 8;
+    // TODO 0d: `public UserServiceImpl(UserDAO userDAO, PasswordUtil passwordUtil)` —
+    //   requireNonNull both. Constructor injection keeps this testable with fake DAOs.
 
     @Override
     public User registerUser(String username, String email, String password, String firstName, String lastName) throws ServiceException {
-        // TODO: Validate username: not null, matches USERNAME_PATTERN
-        // TODO: Validate email: not null, matches EMAIL_PATTERN
-        // TODO: Validate password: not null, length >= MIN_PASSWORD_LENGTH
-        // TODO: Validate firstName and lastName: not null/empty
-        // TODO: Check if username already exists using userDAO.existsByUsername()
-        // TODO: Check if email already exists using userDAO.existsByEmail()
-        // TODO: Hash password using passwordUtil.hashPassword()
-        // TODO: Create new User entity with validated data and hashed password
-        // TODO: Set role to USER, active to true
-        // TODO: Save using userDAO.save()
-        // TODO: Log successful registration
-        // TODO: Return created user
-        // TODO: Catch DAOException and wrap in ServiceException
+        // TODO 1: validateUsername(username): non-null, trim, matches USERNAME_PATTERN —
+        //   else ServiceException("username must be 3-20 letters/digits/underscore").
+        // TODO 2: validateEmail(email): non-null, matches EMAIL_PATTERN, store lowercase —
+        //   else ServiceException("invalid email").
+        // TODO 3: validatePassword(password): non-null, length >= 8 —
+        //   else ServiceException("password must be at least 8 characters").
+        //   (Future: also require a digit; keep simple for coursework.)
+        // TODO 4: validateName(firstName/lastName): non-blank each.
+        // TODO 5: try { if (userDAO.existsByUsername(username)) throw new
+        //   ServiceException("username already taken"); } catch (DAOException e) { wrap }
+        //   Same for existsByEmail. (Race still possible — DB UNIQUE is final guard;
+        //   catch its DAOException and rethrow as "already exists".)
+        // TODO 6: String hash = passwordUtil.hashPassword(password); // NEVER store plain.
+        // TODO 7: User u = new User(username.trim(), email.trim().toLowerCase(), hash);
+        //   u.setFirstName/LastName(trimmed); u.setRole(User.UserRole.USER);
+        //   u.setActive(true);
+        // TODO 8: try { User saved = userDAO.save(u);
+        //   logger.info("registered reviewer {}", username); return saved; }
+        //   catch (DAOException e) { throw new ServiceException("registration failed", e); }
         return null; // Remove after implementation
     }
 
     @Override
     public Optional<User> authenticate(String username, String password) throws ServiceException {
-        // TODO: Validate username and password not null/empty
-        // TODO: Find user by username (also tries email) using userDAO.findByUsername()
-        // TODO: If not found, try findByEmail()
-        // TODO: If user found and active, verify password using passwordUtil.verifyPassword()
-        // TODO: If password valid, update last login using userDAO.updateLastLogin()
-        // TODO: Return Optional.of(user) or Optional.empty()
-        // TODO: Catch DAOException and wrap in ServiceException
+        // TODO 1: if either null/blank throw ServiceException("username and password required").
+        //   (Throw, don't return empty — caller bug vs bad credentials must differ.)
+        // TODO 2: try {
+        //   Optional<User> u = userDAO.findByUsername(username.trim());
+        //   if (u.isEmpty()) u = userDAO.findByEmail(username.trim().toLowerCase());
+        // TODO 3: if (u.isEmpty() || !u.get().isActive()) return Optional.empty();
+        //   (Same response for unknown vs inactive — do not leak which.)
+        // TODO 4: if (!passwordUtil.verifyPassword(password, u.get().getPasswordHash()))
+        //   return Optional.empty();
+        // TODO 5: userDAO.updateLastLogin(id, LocalDateTime.now());
+        //   If stamping fails, still return the user (login succeeded) but log warn.
+        // TODO 6: logger.info("login {}", username); return u;
+        //   } catch (DAOException e) { throw new ServiceException("authentication error", e); }
         return Optional.empty(); // Remove after implementation
     }
 
     @Override
     public User updateProfile(Long userId, String firstName, String lastName, String phoneNumber, String email) throws ServiceException {
-        // TODO: Validate userId not null
-        // TODO: Find existing user by ID
-        // TODO: If not found, throw ServiceException
-        // TODO: If email provided, validate format and check uniqueness (excluding current user)
-        // TODO: Update fields if provided (non-null)
-        // TODO: Save using userDAO.update()
-        // TODO: Log profile update
-        // TODO: Return updated user
-        // TODO: Catch DAOException and wrap in ServiceException
+        // TODO 1: if (userId == null) throw ServiceException("user id required").
+        // TODO 2: Load: User u = userDAO.findById(userId).orElseThrow(() ->
+        //   new ServiceException("reviewer not found"));
+        // TODO 3: If email != null: validate format; check existsByEmail AND the owner
+        //   isn't this user (load by email, compare ids) — else "email already in use".
+        //   Then u.setEmail(lowercased).
+        // TODO 4: For each of firstName/lastName/phoneNumber: if non-null, validate
+        //   (names non-blank; phone 10-15 chars loose check) and set.
+        // TODO 5: userDAO.update(u); log; return updated. Wrap DAOException.
         return null; // Remove after implementation
     }
 
     @Override
     public boolean changePassword(Long userId, String currentPassword, String newPassword) throws ServiceException {
-        // TODO: Validate userId, currentPassword, newPassword not null/empty
-        // TODO: Validate newPassword length >= MIN_PASSWORD_LENGTH
-        // TODO: Find user by ID
-        // TODO: If not found, throw ServiceException
-        // TODO: Verify current password using passwordUtil.verifyPassword()
-        // TODO: If invalid, throw ServiceException
-        // TODO: Hash new password
-        // TODO: Update using userDAO.changePassword()
-        // TODO: Log password change
-        // TODO: Return true
-        // TODO: Catch DAOException and wrap in ServiceException
+        // TODO 1: Null/blank-check all three; newPassword length >= 8.
+        // TODO 2: Load user or throw "reviewer not found".
+        // TODO 3: if (!passwordUtil.verifyPassword(currentPassword, u.getPasswordHash()))
+        //   throw new ServiceException("current password is incorrect");
+        // TODO 4: String hash = passwordUtil.hashPassword(newPassword);
+        //   userDAO.changePassword(userId, hash); log (id only); return true.
+        // TODO 5: Wrap DAOException as ServiceException("password change failed", e).
         return false; // Remove after implementation
     }
 
     @Override
     public Optional<User> findById(Long userId) throws ServiceException {
-        // TODO: Validate userId
-        // TODO: Call userDAO.findById()
-        // TODO: Catch DAOException and wrap in ServiceException
+        // TODO 1: Validate non-null. try { return userDAO.findById(userId); }
+        //   catch (DAOException e) { throw new ServiceException("lookup failed", e); }
         return Optional.empty(); // Remove after implementation
     }
 
     @Override
     public Optional<User> findByUsername(String username) throws ServiceException {
-        // TODO: Validate username
-        // TODO: Call userDAO.findByUsername()
-        // TODO: Catch DAOException and wrap in ServiceException
+        // TODO 1: Validate non-blank; delegate to userDAO.findByUsername; wrap exception.
         return Optional.empty(); // Remove after implementation
     }
 
     @Override
     public List<User> getActiveUsers() throws ServiceException {
-        // TODO: Call userDAO.findActiveUsers()
-        // TODO: Catch DAOException and wrap in ServiceException
+        // TODO 1: try { return userDAO.findActiveUsers(); } catch wrap.
+        //   Admin screen + login eligibility source.
         return List.of(); // Remove after implementation
     }
 
     @Override
     public List<User> getUsersByRole(User.UserRole role) throws ServiceException {
-        // TODO: Validate role not null
-        // TODO: Call userDAO.findByRole()
-        // TODO: Catch DAOException and wrap in ServiceException
+        // TODO 1: if (role == null) throw ServiceException("role is required").
+        // TODO 2: Delegate to userDAO.findByRole(role); wrap. (Needs UserRole fix first.)
         return List.of(); // Remove after implementation
     }
 
     @Override
     public List<User> searchUsers(String namePart) throws ServiceException {
-        // TODO: Validate namePart not null/empty
-        // TODO: Call userDAO.searchByName()
-        // TODO: Catch DAOException and wrap in ServiceException
+        // TODO 1: if null/blank throw ServiceException. Delegate to userDAO.searchByName.
+        //   Admin account search only.
         return List.of(); // Remove after implementation
     }
 
     @Override
     public boolean deactivateUser(Long userId) throws ServiceException {
-        // TODO: Validate userId
-        // TODO: Find user by ID
-        // TODO: If not found, throw ServiceException
-        // TODO: Set user.active = false
-        // TODO: Save using userDAO.update()
-        // TODO: Log deactivation
-        // TODO: Return true
-        // TODO: Catch DAOException and wrap in ServiceException
+        // TODO 1: Validate, load or throw "not found". u.setActive(false);
+        //   userDAO.update(u); logger.info("deactivated {}", userId); return true.
+        //   Inactive reviewers immediately fail authenticate().
         return false; // Remove after implementation
     }
 
     @Override
     public boolean activateUser(Long userId) throws ServiceException {
-        // TODO: Validate userId
-        // TODO: Find user by ID
-        // TODO: If not found, throw ServiceException
-        // TODO: Set user.active = true
-        // TODO: Save using userDAO.update()
-        // TODO: Log activation
-        // TODO: Return true
-        // TODO: Catch DAOException and wrap in ServiceException
+        // TODO 1: Mirror deactivate with setActive(true).
         return false; // Remove after implementation
     }
 
     @Override
     public User changeUserRole(Long userId, User.UserRole newRole) throws ServiceException {
-        // TODO: Validate userId and newRole
-        // TODO: Find user by ID
-        // TODO: If not found, throw ServiceException
-        // TODO: Set user.role = newRole
-        // TODO: Save using userDAO.update()
-        // TODO: Log role change
-        // TODO: Return updated user
-        // TODO: Catch DAOException and wrap in ServiceException
+        // TODO 1: Validate both non-null. Load or throw "not found".
+        // TODO 2: u.setRole(newRole); userDAO.update(u);
+        //   logger.info("role {} -> {} for {}", old, new, userId); return u.
+        // TODO 3: Caller (UI) must restrict this to ADMIN callers — enforce here
+        //   if caller identity is passed in future (service-level authz).
         return null; // Remove after implementation
     }
 
-    // TODO: Add private void validateUsername(String username) throws ServiceException helper
-    // TODO: Add private void validateEmail(String email) throws ServiceException helper
-    // TODO: Add private void validatePassword(String password) throws ServiceException helper
-    // TODO: Add private void validateName(String name, String fieldName) throws ServiceException helper
+    // TODO: `private void validateUsername(String v)` — null/blank + pattern check.
+    // TODO: `private void validateEmail(String v)` — null/blank + pattern check.
+    // TODO: `private void validatePassword(String v)` — null + length >= 8.
+    // TODO: `private void validateName(String v, String field)` — null/blank check
+    //   with field name in message. All throw ServiceException (not DAOException).
 }
