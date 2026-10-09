@@ -19,7 +19,7 @@ public class PasswordUtil {
     // TODO 2: `public String hashPassword(String plain)` — main entry point.
     //   1. if (plain == null || plain.length() < 8) throw IllegalArgumentException.
     //   2. return BCrypt.hashpw(plain, BCrypt.gensalt(LOG_ROUNDS));
-    //   Called by UserServiceImpl.registerUser() BEFORE DAO save. Never log `plain`.
+    //   Called by ReviewerServiceImpl.registerReviewer() BEFORE DAO save. Never log `plain`.
 
     // TODO 3: Overload `public String hashPassword(String plain, int logRounds)`.
     //   Same as above with custom cost. Validate 4 <= logRounds <= 31
@@ -43,5 +43,5 @@ public class PasswordUtil {
 
     // TODO 7: `public String rehashPassword(String plain)`.
     //   Convenience: return hashPassword(plain); Called after needsRehash()==true
-    //   post-login. Then persist via UserDAO.changePassword().
+    //   post-login. Then persist via ReviewerDAO.changePassword().
 }

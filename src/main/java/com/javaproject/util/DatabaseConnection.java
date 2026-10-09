@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * <p>Owns: driver loading (once), opening connections (autoCommit=false for
  * flag-update transactions), health check, close, and first-startup schema
- * creation for {@code users} + {@code products} (flag records).</p>
+ * creation for {@code reviewers} + {@code driver_flags} (flag records).</p>
  */
 public class DatabaseConnection {
 
@@ -111,19 +111,24 @@ public class DatabaseConnection {
      * Should be called on application startup.
      * TODO-IMPL:
      *   1. try (Connection c = getConnection(); Statement st = c.createStatement()) {
-     *   2. CREATE TABLE IF NOT EXISTS users (id BIGINT AUTO_INCREMENT PRIMARY KEY,
+     *   2. CREATE TABLE IF NOT EXISTS reviewers (id BIGINT AUTO_INCREMENT PRIMARY KEY,
      *        username VARCHAR(50) UNIQUE NOT NULL, email VARCHAR(100) UNIQUE NOT NULL,
      *        password_hash VARCHAR(255) NOT NULL, first_name VARCHAR(50),
      *        last_name VARCHAR(50), phone_number VARCHAR(20), active BOOLEAN DEFAULT TRUE,
-     *        role VARCHAR(20) DEFAULT 'USER', last_login_at TIMESTAMP NULL,
+     *        role VARCHAR(20) DEFAULT 'REVIEWER', last_login_at TIMESTAMP NULL,
      *        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
      *        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
      *        version INT DEFAULT 0, INDEX idx_username(username), INDEX idx_email(email));
-     *   3. CREATE TABLE IF NOT EXISTS products (... sku UNIQUE, price DECIMAL(10,2),
-     *        quantity_in_stock INT DEFAULT 0, reorder_level INT DEFAULT 10,
-     *        category VARCHAR(50), active BOOLEAN DEFAULT TRUE,
-     *        discontinued_at TIMESTAMP NULL, ...same audit cols...,
-     *        INDEX idx_sku(sku), INDEX idx_category(category));
+     *   3. CREATE TABLE IF NOT EXISTS driver_flags (id BIGINT AUTO_INCREMENT PRIMARY KEY,
+     *        label VARCHAR(100) NOT NULL, summary TEXT NULL,
+     *        driver_id VARCHAR(50) UNIQUE NOT NULL, risk_score DECIMAL(10,2) NOT NULL,
+     *        event_count INT DEFAULT 0, flag_threshold INT DEFAULT 10,
+     *        event_type VARCHAR(50), active BOOLEAN DEFAULT TRUE,
+     *        closed_at TIMESTAMP NULL,
+     *        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     *        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+     *        version INT DEFAULT 0,
+     *        INDEX idx_driver_id(driver_id), INDEX idx_event_type(event_type));
      *      NOTE: no location columns — intentional (privacy).
      *   4. c.commit(); } catch (SQLException e) { rollback; throw e; }
      *   5. logger.info("schema initialized");

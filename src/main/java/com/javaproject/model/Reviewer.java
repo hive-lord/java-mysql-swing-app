@@ -3,15 +3,21 @@ package com.javaproject.model;
 import java.time.LocalDateTime;
 
 /**
- * Reviewer account in Big Brother. Maps to the {@code users} table.
+ * Reviewer account in Big Brother. Maps to the {@code reviewers} table.
  *
  * <p>NOT a driver-tracking record: this is the login account for the humans
  * who review automatically-raised flags (admin / senior reviewer / reviewer).
- * Driver identities themselves live in the flag-record table (Product).</p>
+ * Driver identities themselves live in the flag-record table (DriverFlag).</p>
  *
- * <p>TODO: Add {@code @Table(name = "users")} annotation if using JPA.</p>
+ * <p>TODO: Add {@code @Table(name = "reviewers")} annotation if using JPA.</p>
  */
-public class User extends BaseEntity {
+public class Reviewer extends BaseEntity {
+
+    public enum ReviewerRole {
+        ADMIN,
+        REVIEWER,
+        MANAGER
+    }
 
     // TODO 1: `private String username;` — UNIQUE, NOT NULL, 3-20 chars.
     //   - Allowed: letters, digits, underscore. Regex enforced in service:
@@ -20,7 +26,7 @@ public class User extends BaseEntity {
     //   - Trim before save; reject null/blank with ServiceException.
 
     // TODO 2: `private String email;` — UNIQUE, NOT NULL.
-    //   - Validate with EMAIL_PATTERN ^[A-Za-z0-9+_.-]+@(.+)$ in UserServiceImpl.
+    //   - Validate with EMAIL_PATTERN ^[A-Za-z0-9+_.-]+@(.+)$ in ReviewerServiceImpl.
     //   - Store lowercase. Uniqueness checked via existsByEmail() before save.
     //   - Used as alternate login identifier in authenticate().
 
@@ -39,24 +45,20 @@ public class User extends BaseEntity {
     //   - Nullable in ResultSet mapping: rs.getString() may return null — keep null.
 
     // TODO 7: `private boolean active = true;`
-    //   - Soft-disable. deactivateUser() sets false instead of DELETE.
+    //   - Soft-disable. deactivateReviewer() sets false instead of DELETE.
     //   - authenticate() must reject inactive accounts (return Optional.empty()).
 
-    // TODO 8: `private UserRole role;` — enum ADMIN / MANAGER / USER.
+    // TODO 8: `private ReviewerRole role;` — enum ADMIN / MANAGER / REVIEWER.
     //   - ADMIN = system admin, MANAGER = senior reviewer (can change roles),
-    //     USER = reviewer (confirm/clear flags only).
-    //   - IMPORTANT BUG TO FIX: UserRole is currently declared as a package-private
-    //     top-level enum at the bottom of this file, but DAO/service reference it as
-    //     User.UserRole (nested). Fix: move it INSIDE this class as
-    //     `public enum UserRole { ADMIN, USER, MANAGER }` and delete the bottom one.
-    //   - Column: role VARCHAR(20) NOT NULL DEFAULT 'USER'.
+    //     REVIEWER = reviewer (confirm/clear flags only).
+    //   - Column: role VARCHAR(20) NOT NULL DEFAULT 'REVIEWER'.
 
     // TODO 9: `private LocalDateTime lastLoginAt;` — nullable.
     //   - Stamped by updateLastLogin() on every successful authenticate().
-    //   - SQL: UPDATE users SET last_login_at = ?, updated_at = ? WHERE id = ?.
+    //   - SQL: UPDATE reviewers SET last_login_at = ?, updated_at = ? WHERE id = ?.
 
-    // TODO 10: Constructor `public User(String username, String email, String passwordHash)`.
-    //   - Sets the three required fields; service sets role=USER, active=true.
+    // TODO 10: Constructor `public Reviewer(String username, String email, String passwordHash)`.
+    //   - Sets the three required fields; service sets role=REVIEWER, active=true.
     //   - Validate non-null inside constructor; throw IllegalArgumentException.
 
     // TODO 11: Getters and setters for all fields above.
@@ -66,17 +68,4 @@ public class User extends BaseEntity {
 
     // TODO 13: Override toString() with id, username, email, names, role, active —
     //   explicitly WITHOUT passwordHash.
-}
-
-/**
- * User roles in Big Brother.
- *
- * TODO-FIX: This enum MUST be moved inside the User class as a nested
- * `public enum UserRole` (see TODO 8). As a package-private top-level enum,
- * references like `User.UserRole` in UserDAO/UserService do not compile.
- */
-enum UserRole {
-    ADMIN,
-    USER,
-    MANAGER
 }

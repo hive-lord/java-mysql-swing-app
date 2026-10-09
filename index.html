@@ -161,7 +161,7 @@
     <tr><td>Jackson Databind</td><td>2.15.2</td><td>Reads/writes JSON database config</td></tr>
     <tr><td>SLF4J + Logback</td><td>2.0.9 / 1.4.11</td><td>Audit logging of flags and reviews</td></tr>
     <tr><td>Swing</td><td>JDK built-in</td><td>Flag-queue reviewer console (planned <code>ui.MainFrame</code>)</td></tr>
-    <tr><td>BCrypt (planned)</td><td><code>org.mindrot:jbcrypt</code> — not yet in pom</td><td>Reviewer password hashing, 12 rounds</td></tr>
+    <tr><td>BCrypt (planned)</td><td><code>org.mindrot:jbcrypt:0.4</code> — in pom</td><td>Reviewer password hashing, 12 rounds</td></tr>
   </table>
 
   <h2 id="mapping">3. Domain mapping</h2>
@@ -174,7 +174,7 @@
     <tr><td><code>low-stock</code></td><td>Flag queue query — drivers at or over the threshold.</td></tr>
     <tr><td><code>discontinue</code></td><td>Close a flag (cleared / resolved), soft-close that keeps history.</td></tr>
   </table>
-  <div class="note">Suggested final rename: <code>Product → DriverFlag</code>, <code>sku → driverId</code>, <code>price → riskScore</code>. Logic is unchanged; only names change. Until then, read “product” as “driver flag record”.</div>
+  <div class="note">Naming is final: <code>DriverFlag</code> with <code>driverId / riskScore / eventCount / flagThreshold / eventType</code>. If you see old shop words in comments, read “product” as “driver flag record”.</div>
 
   <h2 id="files">4. File-by-file reference</h2>
   <p>Paths relative to <code>src/main/java/com/javaproject/</code>. All files are skeletons — signatures and TODOs exist, bodies return stubs.</p>
@@ -314,7 +314,7 @@
   <div class="file">
     <div class="path">pom.xml</div>
     <div class="role">Maven build: Java 17, MySQL + Jackson + logging, jar with MainFrame manifest</div>
-    <p>Still needs <code>org.mindrot:jbcrypt:0.4</code> added for PasswordUtil.</p>
+    <p>Includes <code>org.mindrot:jbcrypt:0.4</code> for PasswordUtil.</p>
   </div>
 
   <h2 id="database">5. Database — and why it can't track locations</h2>
@@ -342,7 +342,7 @@
   <h2 id="status">6. Implementation status</h2>
   <p><strong>Done:</strong> package structure, all interfaces with Javadoc, exact SQL in TODO comments, Maven build file.</p>
   <p><strong>Remaining:</strong> every method body plus the flag-queue UI. Order: BaseEntity → User/flag record → DatabaseConfig → ConfigLoader → DatabaseConnection + schema → DAO impls → Service impls (scorer first) → MainFrame flag queue.</p>
-  <div class="warn"><strong>Fix before coding:</strong> (1) Add <code>org.mindrot:jbcrypt:0.4</code> to <code>pom.xml</code>. (2) <code>UserRole</code> is a package-private top-level enum but referenced as <code>User.UserRole</code> — move it inside <code>User</code> as nested public enum. (3) Create <code>ui/MainFrame</code> as a flag-queue screen, not a search screen.</div>
+  <div class="warn"><strong>Fix before coding:</strong> (1) Add <code>org.mindrot:jbcrypt:0.4</code> to <code>pom.xml</code>. (2) <s><code>UserRole</code> nesting</s> — fixed: <code>Reviewer.ReviewerRole { ADMIN, MANAGER, REVIEWER }</code> is now a nested public enum. (3) Create <code>ui/MainFrame</code> as a flag-queue screen, not a search screen.</div>
 
   <h2 id="run">7. Build and run</h2>
   <pre>CREATE DATABASE bigbrother;   -- or keep javaproject for now

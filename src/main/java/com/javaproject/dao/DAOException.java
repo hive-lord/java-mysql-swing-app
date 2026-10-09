@@ -5,16 +5,16 @@ package com.javaproject.dao;
  * Wraps underlying SQLException and provides context about the failed operation.
  *
  * <p>Every DAO method catches SQLException and rethrows DAOException with the
- * operation name (e.g. "save") and entity name (e.g. "User", "Product"/DriverFlag)
+ * operation name (e.g. "save") and entity name (e.g. "Reviewer", "DriverFlag")
  * so the service layer can log and convert without parsing SQL states.</p>
  */
 public class DAOException extends Exception {
 
-    // TODO 1: `private String operation;` — e.g. "save", "findById", "updateStock".
-    //   Set from every catch site: new DAOException("save failed", e, "save", "Product").
+    // TODO 1: `private String operation;` — e.g. "save", "findById", "updateEventCount".
+    //   Set from every catch site: new DAOException("save failed", e, "save", "DriverFlag").
 
-    // TODO 2: `private String entityName;` — e.g. "User", "Product".
-    //   Lets logs read "DAO save failed for Product" instead of bare SQL codes.
+    // TODO 2: `private String entityName;` — e.g. "Reviewer", "DriverFlag".
+    //   Lets logs read "DAO save failed for DriverFlag" instead of bare SQL codes.
 
     // TODO 3: Constructor `public DAOException(String message, Throwable cause,
     //   String operation, String entityName)`.

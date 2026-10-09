@@ -20,9 +20,8 @@ public class DatabaseConfig {
     //   - MySQL port. validate() must enforce 1..65535.
     //   - Wrong port is the #1 "connection refused" cause — fail fast here.
 
-    // TODO 3: `@JsonProperty("database") private String database = "javaproject";`
-    //   - Schema name. For Big Brother use "bigbrother" (or keep javaproject
-    //     until schema is recreated). validate() rejects null/blank.
+    // TODO 3: `@JsonProperty("database") private String database = "bigbrother";`
+    //   - Schema name. validate() rejects null/blank.
     //   - Must exist: CREATE DATABASE bigbrother; before first connect.
 
     // TODO 4: `@JsonProperty("username") private String username = "root";`

@@ -11,10 +11,10 @@ import java.math.RoundingMode;
  * must never be used for scores — binary floating point cannot represent
  * 0.1 exactly and would make flag boundaries flaky.</p>
  */
-public class PriceUtil {
+public class RiskScoreUtil {
 
     // TODO 1: `private static final int SCALE = 2;`
-    //   Two decimals (e.g. 7.75). Matches DECIMAL(10,2) column for price/score.
+    //   Two decimals (e.g. 7.75). Matches DECIMAL(10,2) column for risk_score.
 
     // TODO 2: `private static final RoundingMode ROUNDING_MODE = RoundingMode.HALF_EVEN;`
     //   Banker's rounding — no systematic upward bias over thousands of events.
