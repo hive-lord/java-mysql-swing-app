@@ -9,8 +9,8 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Traffic Management System</name>
-    <description>Traffic Management System - Java desktop app with MySQL backend, layered core services, and Swing frontend</description>
+    <name>Big Brother</name>
+    <description>Big Brother - automated unsafe-driver flagging system. Java desktop app with MySQL backend, layered core services, and Swing frontend. Flags risky drivers automatically; no location tracking.</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
